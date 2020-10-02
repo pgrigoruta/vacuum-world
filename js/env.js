@@ -34,10 +34,8 @@ class Environment {
             for(var j=0;j<this.settings.cols;j++) {
                 var classes = '';
 
-                var filtered = $(this.settings.dirtySquares).filter(function(){
-                    return i==this[0] && j==this[1];
-                });
-                if(filtered.length > 0){
+               
+                if(this.isSquareDirty(i,j)){
                     classes+="dirty ";
                 }
                 
@@ -57,10 +55,61 @@ class Environment {
         
         return html;
     }
+
+    getPerception() {
+        var perception = {}
+        perception.x = this.settings.agentPosition[0];
+        perception.y = this.settings.agentPosition[1];
+        perception.isDirty = this.isSquareDirty(perception.x,perception.y);
+        return perception;
+    }
+
+    measurePerformance() {
+        
+    }
     
     getTime() {
         return this.settings.time;
     }
+    
+    isSquareDirty(i,j) {
+        var filtered = $(this.settings.dirtySquares).filter(function(){
+            return i==this[0] && j==this[1];
+        });
+        return filtered.length > 0;
+    }
 
+    executeAction(action) {
+        switch (action) {
+            case 'SUCK':
+                for(var i=0;i<this.settings.dirtySquares.length;i++) {
+                    var currentDirtySquare = this.settings.dirtySquares[i];
+                    if(currentDirtySquare[0] == this.settings.agentPosition[0] && currentDirtySquare[1] == this.settings.agentPosition[1]) {
+                        this.settings.dirtySquares.splice(i, 1);
+                    }
+                }
+                break;
+            case 'LEFT':
+                if(this.settings.agentPosition[1] > 0) {
+                    this.settings.agentPosition[1]-=1;
+                }
+                break;
+            case 'RIGHT':
+                if(this.settings.agentPosition[1] < this.settings.cols - 1) {
+                    this.settings.agentPosition[1]+=1;
+                }
+                break;
+            case 'UP':
+                if(this.settings.agentPosition[0] > 0) {
+                    this.settings.agentPosition[0]-=1;
+                }
+                break;
+            case 'DOWN':
+                if(this.settings.agentPosition[0] < this.settings.rows - 1) {
+                    this.settings.agentPosition[0]+=1;
+                }
+                break;
+        }
+    }
     
 }
