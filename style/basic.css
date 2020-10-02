@@ -1,0 +1,27 @@
+
+#config {
+    border: 1px solid black;
+}
+
+#playfield {
+    margin: 10px;
+    clear:both;
+}
+#playfield #render {
+    float:left;
+}
+#playfield #info {
+    float: right;
+}
+
+#render table td {
+    border:1px solid black;
+    height:20px;
+    width: 20px;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+#render table td.dirty {
+    background-color: orange;
+}

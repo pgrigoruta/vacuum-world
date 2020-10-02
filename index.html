@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vacuum World!</title>
+    <link rel="stylesheet" href="style/basic.css">
+    <script type="text/javascript" src="js/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="js/controller.js"></script>
+    <script type="text/javascript" src="js/env.js"></script>
+    <script type="text/javascript" src="js/agent.js"></script>
+    
+    <script>
+        var controller = null;
+        function startGame() {
+            var options = {};
+            options.env = {};
+            options.env.cols = $('#num_cols').val();
+            options.env.rows = $('#num_rows').val();
+           
+            if(controller) {
+                controller.stop();
+            }
+            
+            controller = new Controller(options);
+            controller.start();
+        }
+        function stopGame() {
+            if(controller) {
+                controller.stop();
+            }
+        }
+    </script>
+</head>
+<body>
+
+<div id="config">
+    <table>
+        <tr>
+            <td>Rows: </td>
+            <td><input type="text" id="num_rows" value="10"/></td>
+        </tr>
+        <tr>
+            <td>Cols: </td>
+            <td><input type="text" id="num_cols" value="10"/></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <input type="button" id="start" value="START" onclick="startGame()"/>
+                <input type="button" id="stop" value="STOP" onclick="stopGame()"/>
+            </td>
+        </tr>
+    </table>
+    
+    
+</div>
+<div id="playfield">
+    <div id="render"></div>
+    <div id="info">
+        <div>Time: <strong id="currentTime"></strong></div>
+    </div>
+</div>
+
+
+</body>
+</html>
