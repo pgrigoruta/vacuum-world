@@ -15,7 +15,28 @@
             options.env = {};
             options.env.cols = $('#num_cols').val();
             options.env.rows = $('#num_rows').val();
-            options.agent = new ReflexAgent();
+            options.env.agentPosition = [parseInt($('#agent_x').val()), parseInt($('#agent_y').val())]
+            options.agentClass = $('#agent_class').val();
+            
+            var dirtySquaresString = $('#dirty_squares').val();
+            if(dirtySquaresString!='random') {
+                options.env.dirtySquares = [];
+                var points = dirtySquaresString.split('|');
+                for(var i=0;i<points.length;i++) {
+                    var point = points[i].split(',');
+                    options.env.dirtySquares.push([point[0],point[1]]);
+                }
+            }
+
+            var blockedSquaresString = $('#blocked_squares').val();
+            if(blockedSquaresString!='random') {
+                options.env.blockedSquares = [];
+                var points = blockedSquaresString.split('|');
+                for(var i=0;i<points.length;i++) {
+                    var point = points[i].split(',');
+                    options.env.blockedSquares.push([point[0],point[1]]);
+                }
+            }
            
             if(controller) {
                 controller.stop();
@@ -29,6 +50,20 @@
                 controller.stop();
             }
         }
+
+        $(document).ready(function(){
+            $('.predefined_template').change(function(){
+                var template = $(this).val();
+                
+                switch(template) {
+                    case '2_locs_simple':
+                        $('#num_rows').val(1);
+                        $('#num_cols').val(2);
+                        $('#agent_class').val('RationalTwoSquaresSimple');
+                        $('#blocked_squares').val('');
+                }
+            });
+        });
     </script>
 </head>
 <body>
@@ -36,21 +71,65 @@
 <div id="config">
     <table>
         <tr>
-            <td>Rows: </td>
-            <td><input type="text" id="num_rows" value="10"/></td>
-        </tr>
-        <tr>
-            <td>Cols: </td>
-            <td><input type="text" id="num_cols" value="10"/></td>
-        </tr>
-        <tr>
-            <td>Time between actions (ms): </td>
-            <td><input type="text" id="time_between_actions" value="1000"/></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <input type="button" id="start" value="START" onclick="startGame()"/>
-                <input type="button" id="stop" value="STOP" onclick="stopGame()"/>
+            <td>
+                <h2>General settings</h2>
+                <table>
+
+                    <tr>
+                        <td>Rows: </td>
+                        <td><input type="text" id="num_rows" value="10"/></td>
+                    </tr>
+                    <tr>
+                        <td>Cols: </td>
+                        <td><input type="text" id="num_cols" value="10"/></td>
+                    </tr>
+                    <tr>
+                        <td>Agent starts at X:</td>
+                        <td><input type="text" id="agent_x" value="0"/></td>
+                    </tr>
+                    <tr>
+                        <td>Agent starts at Y:</td>
+                        <td><input type="text" id="agent_y" value="0"/></td>
+                    </tr>
+                    <tr>
+                        <td>Dirty squares:</td>
+                        <td><input type="text" id="dirty_squares" value="random"/> <small>random or X1,Y1|X2,Y2|X3,Y3</small> </td>
+                    </tr>
+                    <tr>
+                        <td>Blocked squares:</td>
+                        <td><input type="text" id="blocked_squares" value="random"/> <small>random or X1,Y1|X2,Y2|X3,Y3</small> </td>
+                    </tr>
+                    <tr>
+                        <td>Agent class:</td>
+                        <td>
+                            <select id="agent_class">
+                                <option value="ReflexAgent">ReflexAgent</option>
+                                <option value="RationalTwoSquaresSimple">RationalTwoSquaresSimple</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Time between actions (ms): </td>
+                        <td><input type="text" id="time_between_actions" value="1000"/></td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2">
+                            <input type="button" id="start" value="START" onclick="startGame()"/>
+                            <input type="button" id="stop" value="STOP" onclick="stopGame()"/>
+                        </td>
+                    </tr>
+                    
+                </table>
+                
+            </td>
+            <td>
+                
+                <h2>Pre-defined templates</h2>
+                
+                <input type="radio" value="2_locs_simple" id="2_locs_simple" name="template" class="predefined_template"/>
+                <label for="2_locs_simple">2 locations, cleanliness score only</label><br/>
+                
             </td>
         </tr>
     </table>
@@ -62,7 +141,7 @@
     <div id="info">
         <div>Time: <strong id="currentTime"></strong></div>
         <div>Action: <strong id="currentAction"></strong></div>
-        
+        <div>Agent position: <strong id="current_agent_x"></strong>,<strong id="current_agent_y"></strong></div>
     </div>
 </div>
 

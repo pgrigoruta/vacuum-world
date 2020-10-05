@@ -4,6 +4,7 @@ class Environment {
             'cols': 10,
             'rows': 10,
             'dirtySquares': 'random',
+            'blockedSquares': 'random',
             'agentPosition': [0,0],
             'time': 0
         }
@@ -17,6 +18,18 @@ class Environment {
                     var chance = Math.floor(Math.random() * 4) + 1;
                     if(chance == 1) {
                         this.settings.dirtySquares.push([i,j]);
+                    }
+                }
+            }
+        }
+
+        if(this.settings.blockedSquares == 'random') {
+            this.settings.blockedSquares = [];
+            for(var i=0;i<this.settings.rows;i++) {
+                for(var j=0;j<this.settings.cols;j++) {
+                    var chance = Math.floor(Math.random() * 10) + 1;
+                    if(chance == 1 && !this.isSquareDirty(i,j) && !this.isSquareWithAgent(i,j)) {
+                        this.settings.blockedSquares.push([i,j]);
                     }
                 }
             }
@@ -37,6 +50,9 @@ class Environment {
                
                 if(this.isSquareDirty(i,j)){
                     classes+="dirty ";
+                }
+                if(this.isSquareBlocked(i,j)){
+                    classes+="blocked ";
                 }
                 
                 var occupant = '&nbsp;';
@@ -78,6 +94,23 @@ class Environment {
         });
         return filtered.length > 0;
     }
+    isSquareBlocked(i,j) {
+        var filtered = $(this.settings.blockedSquares).filter(function(){
+            return i==this[0] && j==this[1];
+        });
+        return filtered.length > 0;
+    }
+    isSquareWithAgent(i,j) {
+        return this.getAgentX() == i && this.getAgentY() == j;
+    }
+    
+    getAgentX() {
+        return this.settings.agentPosition[0];
+    }
+
+    getAgentY() {
+        return this.settings.agentPosition[1];
+    }
 
     executeAction(action) {
         switch (action) {
@@ -90,22 +123,22 @@ class Environment {
                 }
                 break;
             case 'LEFT':
-                if(this.settings.agentPosition[1] > 0) {
+                if(this.settings.agentPosition[1] > 0 && !this.isSquareBlocked(this.getAgentX(),this.getAgentY()-1)) {
                     this.settings.agentPosition[1]-=1;
                 }
                 break;
             case 'RIGHT':
-                if(this.settings.agentPosition[1] < this.settings.cols - 1) {
+                if(this.settings.agentPosition[1] < this.settings.cols - 1 && !this.isSquareBlocked(this.getAgentX(),this.getAgentY()+1)) {
                     this.settings.agentPosition[1]+=1;
                 }
                 break;
             case 'UP':
-                if(this.settings.agentPosition[0] > 0) {
+                if(this.settings.agentPosition[0] > 0 && !this.isSquareBlocked(this.getAgentX() -1 ,this.getAgentY())) {
                     this.settings.agentPosition[0]-=1;
                 }
                 break;
             case 'DOWN':
-                if(this.settings.agentPosition[0] < this.settings.rows - 1) {
+                if(this.settings.agentPosition[0] < this.settings.rows - 1 && !this.isSquareBlocked(this.getAgentX() + 1,this.getAgentY())) {
                     this.settings.agentPosition[0]+=1;
                 }
                 break;

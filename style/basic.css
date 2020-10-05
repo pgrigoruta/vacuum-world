@@ -14,6 +14,10 @@
     float: right;
 }
 
+#config table td {
+    vertical-align: top;
+}
+
 #render table td {
     border:1px solid black;
     height:20px;
@@ -24,4 +28,7 @@
 
 #render table td.dirty {
     background-color: orange;
+}
+#render table td.blocked {
+    background-color: black;
 }

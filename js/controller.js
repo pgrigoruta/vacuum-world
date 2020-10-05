@@ -8,7 +8,8 @@ class Controller {
             'currentActionSelector': '#currentAction',
             env: {
                 cols: 10,
-                rows: 10
+                rows: 10,
+                
             },
             agentClass: 'ReflexAgent'
         }
@@ -22,6 +23,8 @@ class Controller {
         this.env.measurePerformance();
         $(this.settings.envSelector).html(this.env.render());
         $(this.settings.currentTimeSelector).html(this.env.getTime());
+        $('#current_agent_x').html(this.env.getAgentX());
+        $('#current_agent_y').html(this.env.getAgentY());
         
         
         var perception = this.env.getPerception();
