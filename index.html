@@ -17,14 +17,19 @@
             options.env.rows = $('#num_rows').val();
             options.env.agentPosition = [parseInt($('#agent_x').val()), parseInt($('#agent_y').val())]
             options.agentClass = $('#agent_class').val();
+            options.env.performanceMeasure = $('#performance_measure').val();
+            options.timeSteps = $('#time_steps').val();
             
             var dirtySquaresString = $('#dirty_squares').val();
             if(dirtySquaresString!='random') {
                 options.env.dirtySquares = [];
                 var points = dirtySquaresString.split('|');
                 for(var i=0;i<points.length;i++) {
-                    var point = points[i].split(',');
-                    options.env.dirtySquares.push([point[0],point[1]]);
+                    if(points[i]) {
+                        var point = points[i].split(',');
+                        options.env.dirtySquares.push([point[0],point[1]]);    
+                    }
+                    
                 }
             }
 
@@ -33,8 +38,10 @@
                 options.env.blockedSquares = [];
                 var points = blockedSquaresString.split('|');
                 for(var i=0;i<points.length;i++) {
-                    var point = points[i].split(',');
-                    options.env.blockedSquares.push([point[0],point[1]]);
+                    if(points[i]) {
+                        var point = points[i].split(',');
+                        options.env.blockedSquares.push([point[0],point[1]]);    
+                    }
                 }
             }
            
@@ -61,6 +68,49 @@
                         $('#num_cols').val(2);
                         $('#agent_class').val('RationalTwoSquaresSimple');
                         $('#blocked_squares').val('');
+                        $('#dirty_squares').val('');
+                        $('#performance_measure').val('numcleansquares');
+                        $('#time_steps').val(10);
+                        break;
+                    case '2_locs_penalize_movement':
+                        $('#num_rows').val(1);
+                        $('#num_cols').val(2);
+                        $('#agent_class').val('RationalTwoSquaresSimple');
+                        $('#blocked_squares').val('');
+                        $('#dirty_squares').val('');
+                        $('#performance_measure').val('numcleansquaresmovepenalize');
+                        $('#time_steps').val(10);
+                        break;
+                    case '2_locs_penalize_movement_with_state':
+                        $('#num_rows').val(1);
+                        $('#num_cols').val(2);
+                        $('#agent_class').val('RationalTwoSquaresSimpleWithState');
+                        $('#blocked_squares').val('');
+                        $('#dirty_squares').val('');
+                        $('#performance_measure').val('numcleansquaresmovepenalize');
+                        $('#time_steps').val(10);
+                        break;
+                    case 'big_reflex_randomized':
+                        $('#num_rows').val(10);
+                        $('#num_cols').val(10);
+                        $('#agent_class').val('ReflexRandomizedAgent');
+                        $('#blocked_squares').val('random');
+                        $('#dirty_squares').val('random');
+                        $('#performance_measure').val('numcleansquares');
+                        $('#time_steps').val(500);
+                        $('#time_between_actions').val(200);
+                        break;
+                    case 'big_reflex_track_moves':
+                        $('#num_rows').val(10);
+                        $('#num_cols').val(10);
+                        $('#agent_class').val('AgentWithState');
+                        $('#blocked_squares').val('random');
+                        $('#dirty_squares').val('random');
+                        $('#performance_measure').val('numcleansquares');
+                        $('#time_steps').val(500);
+                        $('#time_between_actions').val(200);
+                        break;
+                        
                 }
             });
         });
@@ -103,10 +153,25 @@
                         <td>Agent class:</td>
                         <td>
                             <select id="agent_class">
-                                <option value="ReflexAgent">ReflexAgent</option>
+                                <option value="ReflexRandomizedAgent">ReflexRandomizedAgent</option>
                                 <option value="RationalTwoSquaresSimple">RationalTwoSquaresSimple</option>
+                                <option value="RationalTwoSquaresSimpleWithState">RationalTwoSquaresSimpleWithState</option>
+                                <option value="AgentWithState">AgentWithState</option>
                             </select>
                         </td>
+                    </tr>
+                    <tr>
+                        <td>Performance Measure:</td>
+                        <td>
+                            <select id="performance_measure">
+                                <option value="numcleansquares">Number of clean squares</option>
+                                <option value="numcleansquaresmovepenalize">Number of clean squares, penalize movement</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Time steps:</td>
+                        <td><input type="text" id="time_steps" value="10"/><small>The simulation stops after this number of time steps</small></td>
                     </tr>
                     <tr>
                         <td>Time between actions (ms): </td>
@@ -128,7 +193,20 @@
                 <h2>Pre-defined templates</h2>
                 
                 <input type="radio" value="2_locs_simple" id="2_locs_simple" name="template" class="predefined_template"/>
-                <label for="2_locs_simple">2 locations, cleanliness score only</label><br/>
+                <label for="2_locs_simple">2 locations, suck if dirty, otherwise left right, measure clean squares</label><br/>
+
+
+                <input type="radio" value="2_locs_penalize_movement" id="2_locs_penalize_movement" name="template" class="predefined_template"/>
+                <label for="2_locs_penalize_movement">2 locations, suck if dirty, otherwise left right, measure clean squares. Penalize each movement.</label><br/>
+
+                <input type="radio" value="2_locs_penalize_movement_with_state" id="2_locs_penalize_movement_with_state" name="template" class="predefined_template"/>
+                <label for="2_locs_penalize_movement_with_state">2 locations, suck if dirty, otherwise left right, measure clean squares. Penalize each movement. Agent has internal state.</label><br/>
+
+                <input type="radio" value="big_reflex_randomized" id="big_reflex_randomized" name="template" class="predefined_template"/>
+                <label for="big_reflex_randomized">10x10, suck if dirty, otherwise move randomly. Measure clean squares. Reflex agent.</label><br/>
+
+                <input type="radio" value="big_reflex_track_moves" id="big_reflex_track_moves" name="template" class="predefined_template"/>
+                <label for="big_reflex_track_moves">10x10, suck if dirty, otherwise move randomly, but keep track of the moves did in the past and do not repeat them. Measure clean squares. State agent.</label><br/>
                 
             </td>
         </tr>
@@ -138,10 +216,17 @@
 </div>
 <div id="playfield">
     <div id="render"></div>
-    <div id="info">
-        <div>Time: <strong id="currentTime"></strong></div>
-        <div>Action: <strong id="currentAction"></strong></div>
-        <div>Agent position: <strong id="current_agent_x"></strong>,<strong id="current_agent_y"></strong></div>
+    <div id="info" style="clear:both;width:100%;">
+        <div style="float:left;width: 50%;">
+            <div>Time: <strong id="currentTime"></strong></div>
+            <div>Action: <strong id="currentAction"></strong></div>
+            <div>Agent position: <strong id="current_agent_x"></strong>,<strong id="current_agent_y"></strong></div>
+            <div>Performance: <strong id="performance"></strong></div>    
+        </div>
+        <div style="float:right;width: 50%">
+            <div id="reasoning"></div>
+        </div>
+        <div style="clear: both"></div>
     </div>
 </div>
 

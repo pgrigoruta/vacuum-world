@@ -6,7 +6,8 @@ class Environment {
             'dirtySquares': 'random',
             'blockedSquares': 'random',
             'agentPosition': [0,0],
-            'time': 0
+            'time': 0,
+            'performanceMeasure': 'numcleansquares'
         }
 
         this.settings = $.extend({}, this.settings, settings || {});
@@ -34,6 +35,9 @@ class Environment {
                 }
             }
         }
+        
+        this.performance = 0;
+        this.lastAction = '';
         
     }
     
@@ -81,7 +85,19 @@ class Environment {
     }
 
     measurePerformance() {
-        
+        return eval(`this.performance_${this.settings.performanceMeasure}()`);
+    }
+    
+    performance_numcleansquares() {
+        this.performance+= (this.settings.rows*this.settings.cols)-this.settings.dirtySquares.length-this.settings.blockedSquares.length;
+        return this.performance;
+    }
+    performance_numcleansquaresmovepenalize() {
+        this.performance+= (this.settings.rows*this.settings.cols)-this.settings.dirtySquares.length-this.settings.blockedSquares.length;
+        if(['LEFT','RIGHT','UP','DOWN'].includes(this.lastAction)) {
+            this.performance--;
+        }
+        return this.performance;
     }
     
     getTime() {
@@ -142,7 +158,10 @@ class Environment {
                     this.settings.agentPosition[0]+=1;
                 }
                 break;
+            case 'NOOP':
+                break;
         }
+        this.lastAction = action;
     }
     
 }

@@ -9,9 +9,11 @@ class Controller {
             env: {
                 cols: 10,
                 rows: 10,
+                performanceMeasure:'',
                 
             },
-            agentClass: 'ReflexAgent'
+            agentClass: 'ReflexAgent',
+            timeSteps: 10
         }
         
 
@@ -20,12 +22,19 @@ class Controller {
     }
     
     step() {
-        this.env.measurePerformance();
+        if(this.env.getTime() >= parseInt(this.settings.timeSteps)) {
+            this.stop();
+            return;
+        }
+        
         $(this.settings.envSelector).html(this.env.render());
         $(this.settings.currentTimeSelector).html(this.env.getTime());
         $('#current_agent_x').html(this.env.getAgentX());
         $('#current_agent_y').html(this.env.getAgentY());
-        
+        $('#performance').html(this.env.measurePerformance());
+        if(this.agent.debug) {
+            $('#reasoning').html(this.agent.getDebugInfo());
+        }
         
         var perception = this.env.getPerception();
         var action = this.agent.getAction(perception);
