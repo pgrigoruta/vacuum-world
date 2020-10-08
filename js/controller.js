@@ -13,7 +13,8 @@ class Controller {
                 
             },
             agentClass: 'ReflexAgent',
-            timeSteps: 10
+            timeSteps: 10,
+            advanceManually: false
         }
         
 
@@ -48,7 +49,10 @@ class Controller {
     start() {
         this.env = new Environment(this.settings.env);
         this.agent = eval(`new ${this.settings.agentClass}()`);
-        this.playMethod = setInterval( () => this.step(), this.settings.stepTime);
+        if(!this.settings.advanceManually) {
+            this.playMethod = setInterval( () => this.step(), this.settings.stepTime);    
+        }
+        
     }
     
     stop() {

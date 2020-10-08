@@ -7,12 +7,7 @@
     margin: 10px;
     clear:both;
 }
-#playfield #render {
-    float:left;
-}
-#playfield #info {
-    float: right;
-}
+
 
 #config table td {
     vertical-align: top;

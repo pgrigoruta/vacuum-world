@@ -17,12 +17,10 @@ class AgentWithState {
         this.possibleDirections = ['LEFT','RIGHT','UP','DOWN'];
         this.unexploredMoves = [];
         this.doneMoves = [];
+        this.backtrackingMoves = [];
         this.mode = 'exploring';
-        this.reasoning = '';
-        this.lastX = 0;
-        this.lastY = 0;
-        this.lastAction = '';
         this.debug = true;
+        this.backtrackingTo = null;
         
     }
     
@@ -41,7 +39,6 @@ class AgentWithState {
             return 'SUCK';
         }
         
-        console.log(this.mode);
         
         if(this.mode == 'exploring') {
             //add possible moves to the unexplored array, if they were not already done.
@@ -68,6 +65,7 @@ class AgentWithState {
             }
             else {
                 this.mode = 'backtracking';
+                this.backtrackingMoves = [];
                 //Put back possible move as I cannot do it right now, will need to backtrack to the position
                 this.unexploredMoves.push(nextMoveKey);
                 
@@ -79,6 +77,7 @@ class AgentWithState {
         else {
             //backtracking
             var nextMoveKey = this.unexploredMoves.pop();
+            this.backtrackingTo = nextMoveKey;
             var tmp = nextMoveKey.split('-');
             var nextX = tmp[0];
             var nextY = tmp[1];
@@ -103,30 +102,36 @@ class AgentWithState {
         return perception.x == nextX && perception.y == nextY;
     }
     
-    getMoveThatBrinsgMeClosestToNextPosition(perception, nextX, nextY, excludedActions = []) {
+    getMoveThatBrinsgMeClosestToNextPosition(perception, nextX, nextY) {
         var selectedAction = '';
         
-        if(perception.x < nextX && !excludedActions.includes('LEFT')) {
-            selectedAction = 'LEFT';
-        }
-        if(perception.y < nextY  && !excludedActions.includes('UP')) {
+        
+        
+        if(perception.x > parseInt(nextX)) {
             selectedAction = 'UP';
         }
-        if(perception.x > nextX  && !excludedActions.includes('RIGHT')) {
+        else if(perception.y < parseInt(nextY)) {
             selectedAction = 'RIGHT';
         }
-        if(perception.y > nextY  && !excludedActions.includes('DOWN')) {
+        else if(perception.x < parseInt(nextX)) {
             selectedAction = 'DOWN';
         }
+        else if(perception.y > parseInt(nextY)) {
+            selectedAction = 'LEFT';
+        }
         
-        if(selectedAction == this.lastAction && perception.x == this.lastX && perception.y == this.lastY) {
-            //Last action did not work, so just choose a next best
-            excludedActions.push(selectedAction);
-            return this.getMoveThatBrinsgMeClosestToNextPosition(perception,nextX,nextY,excludedActions);
+        
+        
+        
+        var actionKey = perception.x+'-'+perception.y+'-'+selectedAction;
+        
+        if(this.backtrackingMoves.includes(actionKey)) {
+            selectedAction = this.possibleDirections[Math.floor(Math.random() * this.possibleDirections.length)];
+            actionKey = perception.x+'-'+perception.y+'-'+selectedAction;
+            
         }
-        else {
-            return selectedAction;
-        }
+        this.backtrackingMoves.push(actionKey);
+        return selectedAction;
 
        
     }
@@ -135,6 +140,7 @@ class AgentWithState {
         var str = "Current mode: "+this.mode+"<br/>";
         str+="Not explored actions: "+this.unexploredMoves.join(',')+"<br/>";
         str+="Done moves: "+this.doneMoves.join(',')+"<br/>";
+        if(this.backtrackingTo) str+="Backtracking to: "+this.backtrackingTo;
         return str;
     }
     

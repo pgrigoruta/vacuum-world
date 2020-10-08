@@ -19,6 +19,7 @@
             options.agentClass = $('#agent_class').val();
             options.env.performanceMeasure = $('#performance_measure').val();
             options.timeSteps = $('#time_steps').val();
+            options.advanceManually = ($('#manual_time:checked').length > 0);
             
             var dirtySquaresString = $('#dirty_squares').val();
             if(dirtySquaresString!='random') {
@@ -113,6 +114,16 @@
                         
                 }
             });
+
+            $('#manual_time').change(function(){
+                $('#advance').toggle();
+            })
+            $('#advance').click(function(){
+                if(!controller) {
+                    startGame();
+                }
+                controller.step();
+            })
         });
     </script>
 </head>
@@ -175,13 +186,16 @@
                     </tr>
                     <tr>
                         <td>Time between actions (ms): </td>
-                        <td><input type="text" id="time_between_actions" value="1000"/></td>
+                        <td><input type="text" id="time_between_actions" value="1000"/> or <input id="manual_time" type="checkbox"/><label for="manual_time">Advance Manually</label> </td>
                     </tr>
 
                     <tr>
                         <td colspan="2">
                             <input type="button" id="start" value="START" onclick="startGame()"/>
                             <input type="button" id="stop" value="STOP" onclick="stopGame()"/>
+                            
+                            <br/>
+                            <input type="button" id="advance" value="Advance Manually" style="display:none"/>
                         </td>
                     </tr>
                     
@@ -215,19 +229,24 @@
     
 </div>
 <div id="playfield">
-    <div id="render"></div>
-    <div id="info" style="clear:both;width:100%;">
-        <div style="float:left;width: 50%;">
-            <div>Time: <strong id="currentTime"></strong></div>
-            <div>Action: <strong id="currentAction"></strong></div>
-            <div>Agent position: <strong id="current_agent_x"></strong>,<strong id="current_agent_y"></strong></div>
-            <div>Performance: <strong id="performance"></strong></div>    
-        </div>
-        <div style="float:right;width: 50%">
+    <div style="clear:both;width:100%">
+        <div style="float:left;width:50%;">
+            <div id="render" style="clear: both;"></div>
+            <div>
+                <div>Time: <strong id="currentTime"></strong></div>
+                <div>Action: <strong id="currentAction"></strong></div>
+                <div>Agent position: <strong id="current_agent_x"></strong>,<strong id="current_agent_y"></strong></div>
+                <div>Performance: <strong id="performance"></strong></div>
+            </div>    
+        </div>    
+        <div style="float:right;width:50%">
             <div id="reasoning"></div>
         </div>
         <div style="clear: both"></div>
     </div>
+    
+    
+    
 </div>
 
 
