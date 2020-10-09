@@ -8,7 +8,7 @@ Peter Norving's AIMA vacuum world simulator. Supports a few agent types and envi
 
 ## Running
 
-Click ![here](https://pgrigoruta.github.io/vacuum-world/) for a live demo
+Click [here](https://pgrigoruta.github.io/vacuum-world/) for a live demo
 Or open index.html in your browser
 
 ## Description
