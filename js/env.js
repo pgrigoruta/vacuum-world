@@ -7,8 +7,10 @@ class Environment {
             'blockedSquares': 'random',
             'agentPosition': [0,0],
             'time': 0,
-            'performanceMeasure': 'numcleansquares'
+            'performanceMeasure': 'numcleansquares',
+            'perceptionType': 'position'
         }
+        this.lastActionBumped = false;
 
         this.settings = $.extend({}, this.settings, settings || {});
     
@@ -75,14 +77,7 @@ class Environment {
         
         return html;
     }
-
-    getPerception() {
-        var perception = {}
-        perception.x = this.settings.agentPosition[0];
-        perception.y = this.settings.agentPosition[1];
-        perception.isDirty = this.isSquareDirty(perception.x,perception.y);
-        return perception;
-    }
+    
 
     measurePerformance() {
         return eval(`this.performance_${this.settings.performanceMeasure}()`);
@@ -98,6 +93,15 @@ class Environment {
             this.performance--;
         }
         return this.performance;
+    }
+    performance_timetillclean() {
+        if(this.settings.dirtySquares.length > 0) {
+            this.performance++;
+            return this.performance;
+        }
+        else {
+            return this.performance;
+        }
     }
     
     getTime() {
@@ -129,6 +133,8 @@ class Environment {
     }
 
     executeAction(action) {
+        this.lastActionBumped = false;
+        
         switch (action) {
             case 'SUCK':
                 for(var i=0;i<this.settings.dirtySquares.length;i++) {
@@ -142,26 +148,55 @@ class Environment {
                 if(this.settings.agentPosition[1] > 0 && !this.isSquareBlocked(this.getAgentX(),this.getAgentY()-1)) {
                     this.settings.agentPosition[1]-=1;
                 }
+                else {
+                    this.lastActionBumped = true;
+                }
                 break;
             case 'RIGHT':
                 if(this.settings.agentPosition[1] < this.settings.cols - 1 && !this.isSquareBlocked(this.getAgentX(),this.getAgentY()+1)) {
                     this.settings.agentPosition[1]+=1;
+                }
+                else {
+                    this.lastActionBumped = true;
                 }
                 break;
             case 'UP':
                 if(this.settings.agentPosition[0] > 0 && !this.isSquareBlocked(this.getAgentX() -1 ,this.getAgentY())) {
                     this.settings.agentPosition[0]-=1;
                 }
+                else {
+                    this.lastActionBumped = true;
+                }
                 break;
             case 'DOWN':
                 if(this.settings.agentPosition[0] < this.settings.rows - 1 && !this.isSquareBlocked(this.getAgentX() + 1,this.getAgentY())) {
                     this.settings.agentPosition[0]+=1;
+                }
+                else {
+                    this.lastActionBumped = true;
                 }
                 break;
             case 'NOOP':
                 break;
         }
         this.lastAction = action;
+    }
+
+    getPerception() {
+        var perception = {}
+        perception.isDirty = this.isSquareDirty(this.settings.agentPosition[0],this.settings.agentPosition[1]);
+        perception.type = this.settings.perceptionType;
+        
+        if(this.settings.perceptionType == 'position') {
+            perception.x = this.settings.agentPosition[0];
+            perception.y = this.settings.agentPosition[1];    
+        }
+        else {
+            perception.bump = this.lastActionBumped;
+        }
+        
+        
+        return perception;
     }
     
 }

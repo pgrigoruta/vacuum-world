@@ -10,6 +10,7 @@ class Controller {
                 cols: 10,
                 rows: 10,
                 performanceMeasure:'',
+                perceptionType: 'position'
                 
             },
             agentClass: 'ReflexAgent',

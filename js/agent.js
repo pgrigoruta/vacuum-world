@@ -22,9 +22,45 @@ class AgentWithState {
         this.debug = true;
         this.backtrackingTo = null;
         
+        this.lastX = 0;
+        this.lastY = 0;
+        this.lastAction = '';
+        
     }
     
     getAction(perception) {
+        
+        if(perception.type == 'bump') {
+            if(!perception.bump) {
+                switch(this.lastAction) {
+                    case 'UP':
+                        perception.x = this.lastX -1;
+                        perception.y = this.lastY;
+                        break;
+                    case 'DOWN':
+                        perception.x = this.lastX +1;
+                        perception.y = this.lastY;
+                        break;
+                    case 'LEFT':
+                        perception.x = this.lastX;
+                        perception.y = this.lastY - 1;
+                        break;
+                    case 'RIGHT':
+                        perception.x = this.lastX;
+                        perception.y = this.lastY + 1;
+                        break;
+                    default:
+                        perception.x = this.lastX;
+                        perception.y = this.lastY;
+                }
+            }
+            else {
+                perception.x = this.lastX;
+                perception.y = this.lastY;
+            }
+            
+        }
+        
         var action = this.deduceAction(perception);
         
         this.lastAction = action;
