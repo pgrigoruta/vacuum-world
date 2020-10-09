@@ -16,6 +16,7 @@
             options.env.cols = $('#num_cols').val();
             options.env.rows = $('#num_rows').val();
             options.env.agentPosition = [parseInt($('#agent_x').val()), parseInt($('#agent_y').val())]
+            options.env.perceptionType = $('#perception_type').val();
             options.agentClass = $('#agent_class').val();
             options.env.performanceMeasure = $('#performance_measure').val();
             options.timeSteps = $('#time_steps').val();
@@ -72,6 +73,7 @@
                         $('#dirty_squares').val('');
                         $('#performance_measure').val('numcleansquares');
                         $('#time_steps').val(10);
+                        $('#perception_type').val('position');
                         break;
                     case '2_locs_penalize_movement':
                         $('#num_rows').val(1);
@@ -81,6 +83,7 @@
                         $('#dirty_squares').val('');
                         $('#performance_measure').val('numcleansquaresmovepenalize');
                         $('#time_steps').val(10);
+                        $('#perception_type').val('position');
                         break;
                     case '2_locs_penalize_movement_with_state':
                         $('#num_rows').val(1);
@@ -90,6 +93,7 @@
                         $('#dirty_squares').val('');
                         $('#performance_measure').val('numcleansquaresmovepenalize');
                         $('#time_steps').val(10);
+                        $('#perception_type').val('position');
                         break;
                     case 'big_reflex_randomized':
                         $('#num_rows').val(10);
@@ -97,9 +101,10 @@
                         $('#agent_class').val('ReflexRandomizedAgent');
                         $('#blocked_squares').val('random');
                         $('#dirty_squares').val('random');
-                        $('#performance_measure').val('numcleansquares');
-                        $('#time_steps').val(500);
+                        $('#performance_measure').val('timetillclean');
+                        $('#time_steps').val(10000);
                         $('#time_between_actions').val(200);
+                        $('#perception_type').val('position');
                         break;
                     case 'big_reflex_track_moves':
                         $('#num_rows').val(10);
@@ -107,9 +112,21 @@
                         $('#agent_class').val('AgentWithState');
                         $('#blocked_squares').val('random');
                         $('#dirty_squares').val('random');
-                        $('#performance_measure').val('numcleansquares');
-                        $('#time_steps').val(500);
+                        $('#performance_measure').val('timetillclean');
+                        $('#time_steps').val(10000);
                         $('#time_between_actions').val(200);
+                        $('#perception_type').val('position');
+                        break;
+                    case 'big_reflex_track_moves_bump':
+                        $('#num_rows').val(10);
+                        $('#num_cols').val(10);
+                        $('#agent_class').val('AgentWithState');
+                        $('#blocked_squares').val('random');
+                        $('#dirty_squares').val('random');
+                        $('#performance_measure').val('timetillclean');
+                        $('#time_steps').val(10000);
+                        $('#time_between_actions').val(200);
+                        $('#perception_type').val('bump');
                         break;
                         
                 }
@@ -172,11 +189,21 @@
                         </td>
                     </tr>
                     <tr>
+                        <td>Perception type</td>
+                        <td>
+                            <select id="perception_type">
+                                <option value="position">Position + Clean/Dirty</option>
+                                <option value="bump">Bump sensor + Clean/Dirty</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
                         <td>Performance Measure:</td>
                         <td>
                             <select id="performance_measure">
                                 <option value="numcleansquares">Number of clean squares</option>
                                 <option value="numcleansquaresmovepenalize">Number of clean squares, penalize movement</option>
+                                <option value="timetillclean">Time till all env clean lower is better</option>
                             </select>
                         </td>
                     </tr>
@@ -217,10 +244,13 @@
                 <label for="2_locs_penalize_movement_with_state">2 locations, suck if dirty, otherwise left right, measure clean squares. Penalize each movement. Agent has internal state.</label><br/>
 
                 <input type="radio" value="big_reflex_randomized" id="big_reflex_randomized" name="template" class="predefined_template"/>
-                <label for="big_reflex_randomized">10x10, suck if dirty, otherwise move randomly. Measure clean squares. Reflex agent.</label><br/>
+                <label for="big_reflex_randomized">10x10, suck if dirty, otherwise move randomly. Measure clean squares. Reflex agent. Measure time till env is clean.</label><br/>
 
                 <input type="radio" value="big_reflex_track_moves" id="big_reflex_track_moves" name="template" class="predefined_template"/>
-                <label for="big_reflex_track_moves">10x10, suck if dirty, otherwise move randomly, but keep track of the moves did in the past and do not repeat them. Measure clean squares. State agent.</label><br/>
+                <label for="big_reflex_track_moves">10x10, suck if dirty, otherwise do a search to explore all moves. Able to backtrack. State agent. Measure time till env is clean.</label><br/>
+
+                <input type="radio" value="big_reflex_track_moves_bump" id="big_reflex_track_moves_bump" name="template" class="predefined_template"/>
+                <label for="big_reflex_track_moves">10x10, suck if dirty, otherwise do a search to explore all moves. Able to backtrack. State agent. Measure time till env is clean. Position in perception is replaced with a bump sensor that says only if it managed to move to the next position instead of the actual position. Note that the debug log reflects what the agent thinks its position is, not the actual position.</label><br/>
                 
             </td>
         </tr>
