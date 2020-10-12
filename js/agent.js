@@ -17,6 +17,7 @@ class AgentWithState {
         this.possibleDirections = ['LEFT','RIGHT','UP','DOWN'];
         this.unexploredMoves = [];
         this.doneMoves = [];
+        this.donePositions = [];
         this.backtrackingMoves = [];
         this.mode = 'exploring';
         this.debug = true;
@@ -61,11 +62,20 @@ class AgentWithState {
             
         }
         
+        if(!this.donePositions.length) {
+            var positionKey = perception.x+'-'+perception.y;
+            if(!this.donePositions.includes(positionKey)) {
+                this.donePositions.push(positionKey);
+            }
+        }
+        
         var action = this.deduceAction(perception);
         
         this.lastAction = action;
         this.lastX = perception.x;
         this.lastY = perception.y;
+        
+        
         
         return action;
     }
@@ -89,14 +99,24 @@ class AgentWithState {
             if(!this.unexploredMoves.length) {
                 return 'NOOP';
             }
-            var nextMoveKey = this.unexploredMoves.pop();
-            var tmp = nextMoveKey.split('-');
-            var nextX = tmp[0];
-            var nextY = tmp[1];
-            var nextAction = tmp[2];
+            
+            while(this.unexploredMoves.length) {
+                var nextMoveKey = this.unexploredMoves.pop();
+                var tmp = nextMoveKey.split('-');
+                var nextX = tmp[0];
+                var nextY = tmp[1];
+                var nextAction = tmp[2];
+                
+                var nextPosition = this.getNextPositionBasedOnAction(nextX,nextY,nextAction);
+                if(!this.donePositions.includes(nextPosition[0]+'-'+nextPosition[1])) {
+                    break;
+                }
+            }
+            
             
             if(this.nextMoveStartsAtCurrentPosition(perception,nextX,nextY)) {
                 this.doneMoves.push(nextMoveKey);
+                this.donePositions.push(nextPosition[0]+'-'+nextPosition[1]);
                 return nextAction;
             }
             else {
@@ -138,10 +158,27 @@ class AgentWithState {
         return perception.x == nextX && perception.y == nextY;
     }
     
+    getNextPositionBasedOnAction(x,y,action) {
+        switch(action) {
+            case 'LEFT':
+                y--;
+                break;
+            case 'RIGHT':
+                y++;
+                break;
+            case 'UP':
+                x--;
+                break;
+            case 'DOWN':
+                x++;
+                break;
+            default:
+        }
+        return [x,y];
+    }
+    
     getMoveThatBrinsgMeClosestToNextPosition(perception, nextX, nextY) {
         var selectedAction = '';
-        
-        
         
         if(perception.x > parseInt(nextX)) {
             selectedAction = 'UP';
